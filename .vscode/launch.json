@@ -1,0 +1,15 @@
+{
+    "configurations": [
+        {
+            "name": "Example",
+            "type": "node",
+            "request": "launch",
+            "runtimeExecutable": "node",
+            "runtimeArgs": ["--nolazy", "-r", "ts-node/register/transpile-only"],
+            "args": ["lib/main.ts", "./ts/fabric.ts"],
+            "cwd": "${workspaceRoot}",
+            "internalConsoleOptions": "openOnSessionStart",
+            "skipFiles": ["<node_internals>/**", "node_modules/**"],
+        }
+    ]
+}
