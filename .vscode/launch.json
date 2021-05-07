@@ -6,7 +6,7 @@
             "request": "launch",
             "runtimeExecutable": "node",
             "runtimeArgs": ["--nolazy", "-r", "ts-node/register/transpile-only"],
-            "args": ["lib/main.ts", "./ts/fabric.ts"],
+            "args": ["lib/main.ts", "../word/melo/core/test/layout_test.ts", "--destination", "./dist"],
             "cwd": "${workspaceRoot}",
             "internalConsoleOptions": "openOnSessionStart",
             "skipFiles": ["<node_internals>/**", "node_modules/**"],

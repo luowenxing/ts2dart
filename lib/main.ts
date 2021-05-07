@@ -128,11 +128,16 @@ export class Transpiler {
 
     // Only write files that were explicitly passed in.
     let fileSet: {[s: string]: boolean} = {};
-    fileNames.forEach((f) => fileSet[f] = true);
+    fileNames.forEach((f) => {
+      if (!fs.existsSync(f)) {
+        throw new Error(`file not exist: ${f}`)
+      }
+      fileSet[f] = true;
+    });
     this.errors = [];
 
     program.getSourceFiles()
-        .filter((sourceFile) => fileSet[sourceFile.fileName])
+        // .filter((sourceFile) => fileSet[sourceFile.fileName])
         // Do not generate output for .d.ts files.
         .filter((sourceFile: ts.SourceFile) => !sourceFile.fileName.match(/\.d\.ts$/))
         .forEach((f: ts.SourceFile) => {
@@ -195,6 +200,7 @@ export class Transpiler {
 
   // Visible for testing.
   getOutputPath(filePath: string, destinationRoot: string): string {
+    filePath = fs.realpathSync(filePath);
     let relative = this.getRelativeFileName(filePath);
     let dartFile = relative.replace(/.(js|es6|ts)$/, '.dart');
     return this.normalizeSlashes(path.join(destinationRoot, dartFile));
@@ -436,7 +442,7 @@ Usage: ts2dart [input-files] [arguments]
 
 // CLI entry point
 if (require.main === module) {
-  let args = require('minimist')(process.argv.slice(2), {base: 'string'});
+  let args = require('minimist')(process.argv.slice(2), {base: 'string', destination: 'string'});
   if (args.help) showHelp();
   try {
     let transpiler = new Transpiler(args);

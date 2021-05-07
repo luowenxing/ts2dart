@@ -6,7 +6,8 @@
     "noEmit": true,
     "noEmitOnError": true,
     "noImplicitAny": true,
-    "allowUnreachableCode": false
+    "allowUnreachableCode": false,
+    "lib": ["DOM"]
   },
   "exclude": [
     "node_modules",
