@@ -136,17 +136,28 @@ export class Transpiler {
     });
     this.errors = [];
 
-    program.getSourceFiles()
-        // .filter((sourceFile) => fileSet[sourceFile.fileName])
-        // Do not generate output for .d.ts files.
-        .filter((sourceFile: ts.SourceFile) => !sourceFile.fileName.match(/\.d\.ts$/))
-        .forEach((f: ts.SourceFile) => {
-          let dartCode = this.translate(f);
-          let outputFile = this.getOutputPath(f.fileName, destinationRoot);
-          mkdirP(path.dirname(outputFile));
-          fs.writeFileSync(outputFile, dartCode);
-        });
-    this.checkForErrors(program);
+    const pathsResult = this.translateProgram(program, host);
+
+    Object.keys(pathsResult).forEach((pathString: string) => {
+      const outputFile = this.getOutputPath(pathString, destinationRoot);
+      const dartCode = pathsResult[pathString];
+      mkdirP(path.dirname(outputFile));
+      fs.writeFileSync(outputFile, dartCode);
+    });
+
+    console.log(pathsResult);
+
+    // program.getSourceFiles()
+    //     // .filter((sourceFile) => fileSet[sourceFile.fileName])
+    //     // Do not generate output for .d.ts files.
+    //     .filter((sourceFile: ts.SourceFile) => !sourceFile.fileName.match(/\.d\.ts$/))
+    //     .forEach((f: ts.SourceFile) => {
+    //       let dartCode = this.translate(f);
+    //       let outputFile = this.getOutputPath(f.fileName, destinationRoot);
+    //       mkdirP(path.dirname(outputFile));
+    //       fs.writeFileSync(outputFile, dartCode);
+    //     });
+    // this.checkForErrors(program);
   }
 
   translateProgram(program: ts.Program, host: ts.CompilerHost): {[path: string]: string} {
@@ -448,6 +459,7 @@ if (require.main === module) {
     let transpiler = new Transpiler(args);
     console.error('Transpiling', args._, 'to', args.destination);
     transpiler.transpile(args._, args.destination);
+    
   } catch (e) {
     if (e.name !== 'TS2DartError') throw e;
     console.error(e.message);

@@ -3,7 +3,6 @@ require('source-map-support').install();
 var clangFormat = require('clang-format');
 var formatter = require('gulp-clang-format');
 var fs = require('fs');
-var fsx = require('fs-extra');
 var gulp = require('gulp');
 var gutil = require('gulp-util');
 var merge = require('merge2');
@@ -59,7 +58,7 @@ gulp.task('compile', function() {
   ]);
 });
 
-gulp.task('test.compile', ['compile'], function(done) {
+gulp.task('test.compile', function(done) {
   if (hasError) {
     done();
     return;
@@ -75,7 +74,7 @@ gulp.task('test.compile', ['compile'], function(done) {
       .pipe(gulp.dest('build/'));  // '/test/' comes from base above.
 });
 
-gulp.task('test.unit', ['test.compile'], function(done) {
+gulp.task('test.unit', function(done) {
   if (hasError) {
     done();
     return;
@@ -86,14 +85,14 @@ gulp.task('test.unit', ['test.compile'], function(done) {
 });
 
 // This test transpiles some unittests to dart and runs them in the Dart VM.
-gulp.task('test.e2e', ['test.compile'], function(done) {
+gulp.task('test.e2e', function(done) {
   var testfile = 'helloworld';
 
   // Removes backslashes from __dirname in Windows
   var dir = (__dirname.replace(/\\/g, '/') + '/build/e2e');
-  if (fs.existsSync(dir)) fsx.removeSync(dir);
+  if (fs.existsSync(dir)) fs.removeSync(dir);
   fs.mkdirSync(dir);
-  fsx.copySync(__dirname + '/test/e2e/pubspec.yaml', dir + '/pubspec.yaml');
+  fs.copySync(__dirname + '/test/e2e/pubspec.yaml', dir + '/pubspec.yaml');
 
   // run node with a shell so we can wildcard all the .ts files
   var cmd = 'node build/lib/main.js --translateBuiltins --tsconfig test/e2e/tsconfig.json ' +
@@ -120,10 +119,10 @@ gulp.task('test.e2e', ['test.compile'], function(done) {
   });
 });
 
-gulp.task('test.tsc_e2e', ['test.compile'], function(done) {
+gulp.task('test.tsc_e2e', function(done) {
   // Test that "tsconfig.json" is read correctly.
   var outDir = (__dirname.replace(/\\/g, '/') + '/build/tsc_e2e');
-  if (fs.existsSync(outDir)) fsx.removeSync(outDir);
+  if (fs.existsSync(outDir)) fs.removeSync(outDir);
   fs.mkdirSync(outDir);
 
   var cmd = 'node build/lib/main.js --translateBuiltins --tsconfig test/tsc_e2e/tsconfig.json ' +
@@ -142,13 +141,8 @@ gulp.task('test.tsc_e2e', ['test.compile'], function(done) {
   });
 });
 
-gulp.task(
-    'test', ['test.check-format', 'test.check-lint', 'test.unit', 'test.e2e', 'test.tsc_e2e']);
-
-gulp.task('watch', ['test.unit'], function() {
+gulp.task('watch', function() {
   failOnError = false;
   // Avoid watching generated .d.ts in the build (aka output) directory.
   return gulp.watch(['lib/**/*.ts', 'test/**/*.ts'], {ignoreInitial: true}, ['test.unit']);
 });
-
-gulp.task('default', ['compile']);
