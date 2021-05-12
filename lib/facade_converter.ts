@@ -2,6 +2,7 @@ import * as path from 'path';
 import * as ts from 'typescript';
 
 import * as base from './base';
+import { DartKeywards } from './dart_define';
 import {Transpiler} from './main';
 
 type CallHandler = (c: ts.CallExpression, context: ts.Expression) => void;
@@ -288,6 +289,10 @@ export class FacadeConverter extends base.TranspilerBase {
         }
       }
     }
+    if (DartKeywards.has(ident)) {
+      // detect dart identify
+      ident = `${ident}_d`;
+    }
     this.emit(ident);
   }
 
@@ -345,7 +350,8 @@ export class FacadeConverter extends base.TranspilerBase {
     let loc = this.getFileAndName(n, symbol);
     if (!loc) return null;
     let {fileName, qname} = loc;
-    let fileSubs = m[fileName];
+    let fileSubs = m[fileName] || m[DEFAULT_LIB_MARKER];
+    
     if (!fileSubs) return null;
     return fileSubs[qname];
   }
@@ -792,6 +798,10 @@ export class FacadeConverter extends base.TranspilerBase {
           c, 'substr is unsupported, use substring (but beware of the different semantics!)');
       this.visit(context);
       this.emitMethodCall('substr', c.arguments);
+    },
+    'String.replace': (c: ts.CallExpression, context: ts.Expression) => {
+      this.visit(context);
+      this.emitMethodCall('replaceAll', c.arguments);
     },
   });
 

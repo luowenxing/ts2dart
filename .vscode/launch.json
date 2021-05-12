@@ -6,7 +6,7 @@
             "request": "launch",
             "runtimeExecutable": "node",
             "runtimeArgs": ["--nolazy", "-r", "ts-node/register/transpile-only"],
-            "args": ["lib/main.ts", "./ts-test/test.ts", "--translateBuiltins", "--destination", "./dist", "--tsconfig", "./tsconfig.json"],
+            "args": ["lib/main.ts", "../word/melo/src/easysync/index.ts", "--translateBuiltins", "--destination", "./dist", "--tsconfig", "./tsconfig.json"],
             "cwd": "${workspaceRoot}",
             "internalConsoleOptions": "openOnSessionStart",
             "skipFiles": ["<node_internals>/**", "node_modules/**"],
