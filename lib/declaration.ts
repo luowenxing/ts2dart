@@ -279,6 +279,10 @@ export default class DeclarationTranspiler extends base.TranspilerBase {
         } else {
           this.visit(fn.type);
         }
+      } else {
+        // type inference does not exist in source file. It's hard to handle
+        const type = this.fc.tc.getTypeAtLocation(fn);
+        this.reportError(fn, `type inference not supported yet. InferredType: ${this.fc.tc.typeToString(type)}`)
       }
       if (accessor) this.emit(accessor);
       if (fn.name) this.visit(fn.name);

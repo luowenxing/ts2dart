@@ -71,8 +71,12 @@ export default class TypeTranspiler extends base.TranspilerBase {
         this.visit(first.right);
         break;
       case ts.SyntaxKind.Identifier:
-        let ident = <ts.Identifier>node;
-        this.fc.visitTypeName(ident);
+        let identNode = <ts.Identifier>node;
+        if (base.ident(identNode) === 'undefined') {
+          this.emit('null');
+          break;
+        }
+        this.fc.visitTypeName(identNode);
         break;
       case ts.SyntaxKind.NumberKeyword:
         this.emit('num');

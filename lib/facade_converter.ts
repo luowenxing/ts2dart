@@ -28,7 +28,7 @@ function merge(...args: {[key: string]: any}[]): {[key: string]: any} {
 }
 
 export class FacadeConverter extends base.TranspilerBase {
-  private tc: ts.TypeChecker;
+  public readonly tc: ts.TypeChecker;
   private defaultLibLocation: string;
   private candidateProperties: {[propertyName: string]: boolean} = {};
   private candidateTypes: {[typeName: string]: boolean} = {};
@@ -307,7 +307,7 @@ export class FacadeConverter extends base.TranspilerBase {
     let loc = this.getFileAndName(c, symbol);
     if (!loc) return true;
     let {fileName, qname} = loc;
-    let fileSubs = this.callHandlerReplaceNew[fileName];
+    let fileSubs = this.callHandlerReplaceNew[fileName] || this.callHandlerReplaceNew[DEFAULT_LIB_MARKER];
     if (!fileSubs) return true;
     return !fileSubs[qname];
   }
@@ -803,10 +803,19 @@ export class FacadeConverter extends base.TranspilerBase {
       this.visit(context);
       this.emitMethodCall('replaceAll', c.arguments);
     },
+    'String': (c: ts.CallExpression, context: ts.Expression) => {
+      // conver string constructor to toString method call in dart
+      this.emit('(');
+      this.visit(c.arguments[0]);
+      this.emit(').toString()');
+    }
   });
 
   private callHandlerReplaceNew: ts.Map<ts.Map<boolean>> = {
-    [DEFAULT_LIB_MARKER]: {'Promise': true},
+    [DEFAULT_LIB_MARKER]: {
+      'Promise': true,
+      'String': true,
+    },
   };
 
   private callHandlers: ts.Map<ts.Map<CallHandler>> = {

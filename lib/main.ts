@@ -144,7 +144,7 @@ export class Transpiler {
       mkdirP(path.dirname(outputFile));
       fs.writeFileSync(outputFile, dartCode);
     });
-
+    this.checkForErrors(program);
     console.log(pathsResult);
 
     // program.getSourceFiles()
@@ -172,7 +172,6 @@ export class Transpiler {
             (sourceFile: ts.SourceFile) =>
                 (!sourceFile.fileName.match(/\.d\.ts$/) && !!sourceFile.fileName.match(/\.[jt]s$/)))
         .forEach((f) => paths[f.fileName] = this.translate(f));
-    this.checkForErrors(program);
     return paths;
   }
 
