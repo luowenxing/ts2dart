@@ -79,7 +79,7 @@ export default class TypeTranspiler extends base.TranspilerBase {
         this.fc.visitTypeName(identNode);
         break;
       case ts.SyntaxKind.NumberKeyword:
-        this.emit('num');
+        this.emit('int');
         break;
       case ts.SyntaxKind.StringKeyword:
         this.emit('String');
